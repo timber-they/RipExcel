@@ -22,6 +22,7 @@ public class Numericanvas extends JPanel
     private final static Color gridColor = new Color(200, 200, 200, 200);
     private static final Stroke graphStroke = new BasicStroke(2f);
     private List<Integer> values = new ArrayList<>(10);
+    private List<String> labels = new ArrayList<>();
 
     private void paintBackGround(Graphics2D g, int width, int height)
     {
@@ -104,55 +105,12 @@ public class Numericanvas extends JPanel
         final Graphics2D g = (Graphics2D) graphics;
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        final int length = values.size();
         final int width = getWidth();
         final int height = getHeight();
-        final int maxScore = (int) getMaxScore();
-        final int minScore = (int) getMinScore();
-        final int scoreRange = maxScore - minScore;
 
         paintBackGround(g, width, height);
-        g.setColor(Color.BLACK);
-
-        final FontMetrics fontMetrics = g.getFontMetrics();
-
-        painHatchY(g, width, height, minScore, scoreRange, length, fontMetrics);
-        paintHatchX(g, width, height, minScore, scoreRange, length, fontMetrics);
 
         paintXandYAxis(g, width, height);
-
-        final Stroke oldStroke = g.getStroke();
-        g.setColor(lineColor);
-        g.setStroke(graphStroke);
-
-        final double xScale = ((double) width - (2 * padding) - labelPadding) / (length - 1);
-        final double yScale = ((double) height - 2 * padding - labelPadding) / scoreRange;
-
-        final List<Point> graphPoints = new ArrayList<>(length);
-        for (int i = 0; i < length; i++) {
-            final int x1 = (int) (i * xScale + padding + labelPadding);
-            final int y1 = (int) ((maxScore - values.get(i)) * yScale + padding);
-            graphPoints.add(new Point(x1, y1));
-        }
-
-        for (int i = 0; i < graphPoints.size() - 1; i++) {
-            final int x1 = graphPoints.get(i).x;
-            final int y1 = graphPoints.get(i).y;
-            final int x2 = graphPoints.get(i + 1).x;
-            final int y2 = graphPoints.get(i + 1).y;
-            g.drawLine(x1, y1, x2, y2);
-        }
-
-        boolean drawDots = width > (length * pointWidth);
-        if (drawDots) {
-            g.setStroke(oldStroke);
-            g.setColor(pointColor);
-            for (Point graphPoint : graphPoints) {
-                final int x = graphPoint.x - pointWidth / 2;
-                final int y = graphPoint.y - pointWidth / 2;
-                g.fillOval(x, y, pointWidth, pointWidth);
-            }
-        }
 
         for (int j = 0; j < coordinates.size(); j++)
         {
@@ -166,11 +124,10 @@ public class Numericanvas extends JPanel
         }
 
         // Draw Legend
-        g.setColor(Color.RED);
-        // TODO: Change text
-        g.drawString("Potential", 20, 30);
-        g.setColor(Color.BLACK);
-        g.drawString("Function", 20, 50);
+        for (int i = 0; i < colors.size() && i < labels.size(); i++) {
+            g.setColor(colors.get(i));
+            g.drawString(labels.get(i), 20, 30 + 20 * i);
+        }
     }
 
     public void drawData(List<Coordinate> coordinates) {
@@ -184,11 +141,7 @@ public class Numericanvas extends JPanel
         repaint();
     }
 
-    private double getMinScore() {
-        return values.stream().min(Integer::compareTo).orElse(0);
-    }
-
-    private double getMaxScore() {
-        return values.stream().max(Integer::compareTo).orElse(0);
+    public void setLabels(List<String> labels) {
+        this.labels = labels;
     }
 }

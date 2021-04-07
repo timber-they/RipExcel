@@ -42,7 +42,7 @@ public class CsvParser {
                 return null;
             }
 
-            // Skip first line, as it only contains the header - for now we ignore that
+            // Skip first line, as it only contains the header
             scanner.nextLine();
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
@@ -106,5 +106,41 @@ public class CsvParser {
             }
         }
         return max;
+    }
+
+    public List<String> getLabels(){
+        FileInputStream inputStream = null;
+        Scanner scanner = null;
+        try {
+            inputStream = new FileInputStream(fileName);
+            scanner = new Scanner(inputStream);
+
+            if (!scanner.hasNextLine()) {
+                System.err.println("Empty data file");
+                return null;
+            }
+
+            // Skip first line, as it only contains the header
+            String header = scanner.nextLine();
+            final String[] splitHeader = header.split("" + SEPARATOR);
+            return dataIndices.stream()
+                    .map(index -> index > splitHeader.length ? "?" : splitHeader[index])
+                    .collect(Collectors.toList());
+
+        } catch (FileNotFoundException e) {
+            System.err.println("Couldn't open file - failed with exception:");
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (scanner != null)
+                scanner.close();
+        }
     }
 }

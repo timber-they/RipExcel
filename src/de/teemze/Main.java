@@ -38,6 +38,7 @@ public class Main {
 
     public static void repaint(){
         CsvParser parser = new CsvParser(getAxisIndices(arguments), getDataIndices(arguments), arguments[0]);
+        canvas.setLabels(parser.getLabels());
         canvas.drawMultipleData(parser.getDataCoordinates(canvas.getWidth(), canvas.getHeight()));
     }
 
