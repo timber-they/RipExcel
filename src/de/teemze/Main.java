@@ -9,6 +9,9 @@ import java.util.List;
 public class Main {
 
     private static Numericanvas canvas;
+
+    private static String[] arguments;
+
     /**
      * The main entry point. The first argument should point to the data, the other parameters should be in the following format:
      * <br/>
@@ -30,7 +33,12 @@ public class Main {
             return;
         }
         createWindow();
-        CsvParser parser = new CsvParser(getAxisIndices(args), getDataIndices(args), args[0]);
+        arguments = args;
+        repaint();
+    }
+
+    public static void repaint(){
+        CsvParser parser = new CsvParser(getAxisIndices(arguments), getDataIndices(arguments), arguments[0]);
         canvas.drawMultipleData(parser.getDataCoordinates(canvas.getWidth(), canvas.getHeight()));
     }
 

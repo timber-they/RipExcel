@@ -12,7 +12,7 @@ import java.util.List;
 public class Numericanvas extends JPanel
 {
     private List<List<Coordinate>> coordinates = new ArrayList<>(2);
-    List<Color> colors = Arrays.asList(Color.BLACK, Color.RED);
+    List<Color> colors = Arrays.asList(Color.BLACK, Color.RED, Color.BLUE, Color.GREEN, Color.MAGENTA);
     private final static int padding = 1;
     private final static int labelPadding = 1;
     private final static int pointWidth = 4;
