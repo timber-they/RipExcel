@@ -12,4 +12,7 @@ The indices are obviously zero-based.
 
 Example parameters:
 
-    data.csv axis=0 data=1 data=2 data=3
+    data.csv axis=0 data=2 data=3 data=4 data=8
+Example result:
+
+![Example image](example.png)
