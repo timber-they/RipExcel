@@ -1,3 +1,4 @@
+[![Compile](https://github.com/MetaColon/RipExcel/actions/workflows/build.yml/badge.svg)](https://github.com/MetaColon/RipExcel/actions/workflows/build.yml)
 # RipExcel
 I was annoyed with excels options to plot stuff.
 
