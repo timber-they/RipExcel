@@ -87,8 +87,15 @@ public class Numericanvas extends JPanel
         }
     }
 
+    Dimension size;
     @Override
     public void paintComponent(Graphics graphics) {
+        if (size == null || !size.equals(getSize())) {
+            size = getSize();
+            Main.repaint();
+            return;
+        }
+
         super.paintComponent(graphics);
         if (!(graphics instanceof Graphics2D)) {
             graphics.drawString("Graphics is not Graphics2D, unable to render", 0, 0);

@@ -34,7 +34,6 @@ public class Main {
         }
         createWindow();
         arguments = args;
-        repaint();
     }
 
     public static void repaint(){
