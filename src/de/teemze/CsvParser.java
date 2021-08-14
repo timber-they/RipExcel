@@ -3,10 +3,7 @@ package de.teemze;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class CsvParser {
@@ -24,18 +21,21 @@ public class CsvParser {
     }
 
     public List<List<Double>> getAxisValues() {
-        // TODO
-        return null;
+        return getValues(axisIndices);
     }
 
     public List<List<Double>> getDataValues() {
+        return getValues(dataIndices);
+    }
+
+    private List<List<Double>> getValues(List<Integer> indices){
         FileInputStream inputStream = null;
         Scanner scanner = null;
         try {
             inputStream = new FileInputStream(fileName);
             scanner = new Scanner(inputStream);
 
-            List<List<Double>> res = dataIndices.stream().map(i -> new LinkedList<Double>()).collect(Collectors.toList());
+            List<List<Double>> res = indices.stream().map(i -> new LinkedList<Double>()).collect(Collectors.toList());
 
             if (!scanner.hasNextLine()) {
                 System.err.println("Empty data file");
@@ -47,8 +47,8 @@ public class CsvParser {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 String[] split = line.split("" + SEPARATOR);
-                for (int i = 0; i < dataIndices.size(); i++) {
-                    Integer index = dataIndices.get(i);
+                for (int i = 0; i < indices.size(); i++) {
+                    Integer index = indices.get(i);
                     if (index >= split.length) {
                         System.err.println("Index too high: " + index);
                         continue;
@@ -83,18 +83,43 @@ public class CsvParser {
 
     public List<List<Coordinate>> getDataCoordinates(double width, double height) {
         List<List<Double>> data = getDataValues();
+        // For now we only use the first entry
+        List<Double> axisData = getAxisValues().get(0);
         if (data == null || data.size() <= 0) {
             System.err.println("No data given");
             return null;
         }
-        double inc = width / data.get(0).size();
-        double scale = height / getDataMaximum();
+        if (axisData == null || axisData.size() <= 0){
+            System.err.println("No axis data given");
+            return null;
+        }
+        double minX = axisData.stream().min(Double::compareTo).get();
+        double scaleX = width / (axisData.stream().max(Double::compareTo).get() - minX);
+        double scaleY = height / getDataMaximum();
         return data.stream().map(values -> {
             List<Coordinate> res = new ArrayList<>(values.size());
             for (int i = 0; i < values.size(); i++)
-                res.add(new Coordinate(i * inc, values.get(i) * scale));
+                res.add(new Coordinate((axisData.get(i) - minX) * scaleX, values.get(i) * /*scaleY*/ height / values.stream().max(Double::compareTo).get()));
+            res = averageDuplicates(res);
+            res.sort(Coordinate::compareTo);
             return res;
         }).collect(Collectors.toList());
+    }
+
+    private List<Coordinate> averageDuplicates(List<Coordinate> coordinates){
+        Map<Integer, Set<Double>> table = new HashMap<>(coordinates.size());
+        for (Coordinate coordinate : coordinates) {
+            if (!table.containsKey(coordinate.roundX()))
+                table.put(coordinate.roundX(), new HashSet<>());
+            table.get(coordinate.roundX()).add(coordinate.getY());
+        }
+        return table.entrySet().stream()
+                .map(entry -> new Coordinate(entry.getKey(), average(entry.getValue())))
+                .collect(Collectors.toList());
+    }
+
+    private double average(Collection<Double> values){
+        return values.stream().reduce(Double::sum).get() / values.size();
     }
 
     private double getDataMaximum() {

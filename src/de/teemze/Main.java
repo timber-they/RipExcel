@@ -59,7 +59,7 @@ public class Main {
     }
 
     private static List<Integer> getAxisIndices(String[] args) {
-        return getIndicesStartingWith(args, "index=");
+        return getIndicesStartingWith(args, "axis=");
     }
 
     private static List<Integer> getDataIndices(String[] args) {
